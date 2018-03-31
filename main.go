@@ -34,7 +34,19 @@ func getBooks(w http.ResponseWriter, r *http.Request) {
 
 // get single book
 func getBook(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 
+	// get params
+	params := mux.Vars(r)
+
+	// loop through and find book id
+	for _, item := range books {
+		if item.ID == params["id"] {
+			json.NewEncoder(w).Encode(item)
+			return
+		}
+	}
+	json.NewEncoder(w).Encode(&Book{})
 }
 
 // create new book
