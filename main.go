@@ -6,6 +6,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"path"
 	"strconv"
 
 	"github.com/gorilla/mux"
@@ -98,6 +99,17 @@ func deleteBook(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(books)
 }
 
+func index(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html")
+	root := "static"
+	if r.URL.Path == "" || r.URL.Path == "/" {
+		http.ServeFile(w, r, "./static/index.html")
+	} else {
+		http.ServeFile(w, r, path.Join(root, r.URL.Path))
+	}
+
+}
+
 func main() {
 	// initialize router
 	router := mux.NewRouter()
@@ -113,6 +125,7 @@ func main() {
 	router.HandleFunc("/api/books", createBook).Methods("POST")
 	router.HandleFunc("/api/books/{id}", updateBook).Methods("PUT")
 	router.HandleFunc("/api/books/{id}", deleteBook).Methods("DELETE")
+	router.HandleFunc("/", index).Methods("GET")
 
 	// run server
 	log.Fatal(http.ListenAndServe(":8000", router))
